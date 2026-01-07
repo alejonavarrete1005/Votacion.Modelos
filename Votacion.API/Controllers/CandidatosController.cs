@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Votacion.Modelos;
+using Votacion.Modelos.DTOs;
 
 namespace Votacion.API.Controllers
 {
@@ -32,11 +33,20 @@ namespace Votacion.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostCandidato(Candidato candidato)
+        public async Task<IActionResult> PostCandidato(CandidatoCreateDTO dto)
         {
+            var candidato = new Candidato
+            {
+                UsuarioId = dto.UsuarioId,
+                EleccionId = dto.EleccionId,
+                Propuesta = dto.Propuesta
+            };
+
             _context.Candidatos.Add(candidato);
             await _context.SaveChangesAsync();
+
             return Ok(candidato);
         }
+
     }
 }

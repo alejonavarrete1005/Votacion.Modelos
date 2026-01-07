@@ -11,6 +11,10 @@ namespace Votacion.Modelos
         [Key]
         public int VotoId { get; set; }
 
+        // 🔑 Claves foráneas
+        [ForeignKey("Usuario")]
+        public int UsuarioId { get; set; }
+
         [ForeignKey("Eleccion")]
         public int EleccionId { get; set; }
 
@@ -19,12 +23,14 @@ namespace Votacion.Modelos
 
         public DateTime FechaRegistro { get; set; } = DateTime.UtcNow;
 
-        // Hash para evitar doble voto (no identifica al usuario)
+        // Hash para anonimato
         [Required]
-        public string HashVotante { get; set; }
+        public string HashVotante { get; set; } = string.Empty;
 
-        // 🔗 Navegación
+        // 🔗 Navegaciones
+        public Usuario Usuario { get; set; }
         public Eleccion Eleccion { get; set; }
         public Candidato Candidato { get; set; }
     }
+
 }

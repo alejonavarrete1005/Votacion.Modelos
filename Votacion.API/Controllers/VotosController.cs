@@ -24,21 +24,28 @@ namespace Votacion.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostVoto([FromBody] VotoDTO dto)
+        public async Task<IActionResult> PostVoto(VotoDTO dto)
         {
-            var eleccion = await _context.Elecciones.FindAsync(dto.EleccionId);
-            if (eleccion == null || eleccion.Cerrada)
-                return BadRequest("Elección inválida");
+            var candidato = await _context.Candidatos
+                .FirstOrDefaultAsync(c => c.CandidatoId == dto.CandidatoId);
 
-            var hash = Convert.ToBase64String(
-                SHA256.HashData(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString()))
-            );
+            if (candidato == null)
+                return BadRequest("El candidato no existe");
+
+            var yaVoto = await _context.Votos.AnyAsync(v =>
+                v.UsuarioId == dto.UsuarioId &&
+                v.EleccionId == candidato.EleccionId);
+
+            if (yaVoto)
+                return BadRequest("El usuario ya votó en esta elección");
 
             var voto = new Voto
             {
-                EleccionId = dto.EleccionId,
+                UsuarioId = dto.UsuarioId,
                 CandidatoId = dto.CandidatoId,
-                HashVotante = hash
+                EleccionId = candidato.EleccionId,
+                FechaRegistro = DateTime.UtcNow,
+                HashVotante = Guid.NewGuid().ToString()
             };
 
             _context.Votos.Add(voto);
@@ -46,5 +53,6 @@ namespace Votacion.API.Controllers
 
             return Ok(voto);
         }
+
     }
 }

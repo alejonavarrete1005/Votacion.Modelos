@@ -53,16 +53,20 @@ namespace Votacion.API.Controllers
                 Nombre = dto.Nombre,
                 Descripcion = dto.Descripcion,
                 Tipo = dto.Tipo,
-                FechaInicio = dto.FechaInicio,
-                FechaFin = dto.FechaFin
+                FechaInicio = DateTime.SpecifyKind(dto.FechaInicio, DateTimeKind.Utc),
+                FechaFin = DateTime.SpecifyKind(dto.FechaFin, DateTimeKind.Utc)
             };
 
             _context.Elecciones.Add(eleccion);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetEleccion),
-                new { id = eleccion.EleccionId }, eleccion);
+            return CreatedAtAction(
+                nameof(GetEleccion),
+                new { id = eleccion.EleccionId },
+                eleccion
+            );
         }
+
 
         // PUT: api/Elecciones/5
         [HttpPut("{id}")]
