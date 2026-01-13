@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,36 +26,53 @@ namespace Votacion.API.Controllers
             _context = context;
         }
 
+        // POST: api/Votos
         [HttpPost]
-        public async Task<IActionResult> PostVoto(VotoDTO dto)
+        public async Task<IActionResult> Votar([FromBody] VotoDTO dto)
         {
+            // 1️ Usuario desde el token
+            var usuarioId = int.Parse(
+                User.FindFirst(ClaimTypes.NameIdentifier)!.Value
+            );
+
+            // 2 Obtener candidato
             var candidato = await _context.Candidatos
+                .Include(c => c.Eleccion)
                 .FirstOrDefaultAsync(c => c.CandidatoId == dto.CandidatoId);
 
             if (candidato == null)
-                return BadRequest("El candidato no existe");
+                return BadRequest("Candidato no válido");
 
+            // 3️ Verificar si la elección está activa
+            var ahora = DateTime.UtcNow;
+            if (ahora < candidato.Eleccion.FechaInicio ||
+                ahora > candidato.Eleccion.FechaFin)
+            {
+                return BadRequest("La elección no está activa");
+            }
+
+            // 4️ Evitar doble voto
             var yaVoto = await _context.Votos.AnyAsync(v =>
-                v.UsuarioId == dto.UsuarioId &&
-                v.EleccionId == candidato.EleccionId);
+                v.EleccionId == candidato.EleccionId &&
+                v.HashVotante == usuarioId.ToString()
+            );
 
             if (yaVoto)
                 return BadRequest("El usuario ya votó en esta elección");
 
+            // 5️ Registrar voto
             var voto = new Voto
             {
-                UsuarioId = dto.UsuarioId,
-                CandidatoId = dto.CandidatoId,
                 EleccionId = candidato.EleccionId,
+                CandidatoId = candidato.CandidatoId,
                 FechaRegistro = DateTime.UtcNow,
-                HashVotante = Guid.NewGuid().ToString()
+                HashVotante = usuarioId.ToString()
             };
 
             _context.Votos.Add(voto);
             await _context.SaveChangesAsync();
 
-            return Ok(voto);
+            return Ok("Voto registrado correctamente");
         }
-
     }
 }

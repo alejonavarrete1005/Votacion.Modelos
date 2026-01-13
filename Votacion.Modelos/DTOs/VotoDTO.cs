@@ -6,7 +6,7 @@ namespace Votacion.Modelos.DTOs
 {
     public class VotoDTO
     {
-        public int UsuarioId { get; set; }
+        //public int UsuarioId { get; set; }
         public int CandidatoId { get; set; }
     }
 

@@ -101,6 +101,11 @@ namespace Votacion.API.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+        [HttpGet("ping")]
+        public IActionResult Ping()
+        {
+            return Ok("Auth OK");
+        }
 
 
     }
