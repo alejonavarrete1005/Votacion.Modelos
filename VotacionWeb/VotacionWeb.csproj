@@ -10,4 +10,8 @@
     <ProjectReference Include="..\Votacion.Modelos\Votacion.Modelos.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="10.0.2" />
+  </ItemGroup>
+
 </Project>
