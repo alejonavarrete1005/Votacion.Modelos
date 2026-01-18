@@ -22,15 +22,27 @@ public class AuthController : Controller
     [HttpPost]
     public async Task<IActionResult> Login(string email, string password)
     {
+        if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+        {
+            ViewBag.Error = "Debe ingresar correo y contraseña";
+            return View();
+        }
+
         var client = _httpClientFactory.CreateClient("VotacionAPI");
 
-        var json = JsonSerializer.Serialize(new
+        var payload = new
         {
-            email,
-            password
-        });
+            email = email,
+            password = password
+        };
 
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        var json = JsonSerializer.Serialize(payload);
+
+        var content = new StringContent(
+            json,
+            Encoding.UTF8,
+            "application/json"
+        );
 
         var response = await client.PostAsync("api/Auth/login", content);
 
@@ -41,12 +53,27 @@ public class AuthController : Controller
         }
 
         var responseBody = await response.Content.ReadAsStringAsync();
+
         var data = JsonSerializer.Deserialize<JsonElement>(responseBody);
 
+        // Obtener token
         var token = data.GetProperty("token").GetString();
 
-        // Guardar token en sesión
-        HttpContext.Session.SetString("JWT", token!);
+        if (string.IsNullOrEmpty(token))
+        {
+            ViewBag.Error = "Error al generar el token";
+            return View();
+        }
+
+        //  Guardar token en sesión
+        HttpContext.Session.SetString("JWT", token);
+
+        // (opcional) guardar datos del usuario
+        HttpContext.Session.SetString("UsuarioNombre",
+            data.GetProperty("nombreCompleto").GetString() ?? "");
+
+        HttpContext.Session.SetString("UsuarioRol",
+            data.GetProperty("rol").GetInt32().ToString());
 
         return RedirectToAction("Index", "Home");
     }
@@ -56,5 +83,6 @@ public class AuthController : Controller
         HttpContext.Session.Clear();
         return RedirectToAction("Login");
     }
+
 }
 
