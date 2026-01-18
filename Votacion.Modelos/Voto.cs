@@ -11,7 +11,7 @@ namespace Votacion.Modelos
         [Key]
         public int VotoId { get; set; }
 
-        // 🔑 Claves foráneas
+        // Claves foráneas
         [ForeignKey("Usuario")]
         public int UsuarioId { get; set; }
 
@@ -27,7 +27,7 @@ namespace Votacion.Modelos
         [Required]
         public string HashVotante { get; set; } = string.Empty;
 
-        // 🔗 Navegaciones
+        // Navegaciones
         public Usuario Usuario { get; set; }
         public Eleccion Eleccion { get; set; }
         public Candidato Candidato { get; set; }

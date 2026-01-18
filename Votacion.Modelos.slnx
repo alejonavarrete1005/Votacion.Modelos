@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="Votacion.API/Votacion.API.csproj" />
   <Project Path="Votacion.Modelos/Votacion.Modelos.csproj" />
+  <Project Path="VotacionWeb/VotacionWeb.csproj" Id="aab5aa94-7ce8-48e1-a519-36a1fe4cc70c" />
 </Solution>

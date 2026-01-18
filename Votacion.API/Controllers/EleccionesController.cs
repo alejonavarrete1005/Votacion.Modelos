@@ -46,7 +46,7 @@ namespace Votacion.API.Controllers
         }
 
         // POST: api/Elecciones
-        [Authorize(Roles = "Admin, Votante")]
+        
         [HttpPost]
         public async Task<ActionResult<Eleccion>> PostEleccion(EleccionDTO dto)
         {
@@ -71,7 +71,7 @@ namespace Votacion.API.Controllers
 
 
         // PUT: api/Elecciones/5
-        [Authorize(Roles = "Admin")]
+        
         [HttpPut("{id}")]
         public async Task<IActionResult> PutEleccion(int id, EleccionDTO dto)
         {
@@ -90,7 +90,7 @@ namespace Votacion.API.Controllers
         }
 
         // DELETE: api/Elecciones/5
-        [Authorize(Roles = "Admin")]
+       
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEleccion(int id)
         {

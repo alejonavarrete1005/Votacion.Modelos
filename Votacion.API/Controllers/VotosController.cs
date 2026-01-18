@@ -14,7 +14,7 @@ using Votacion.Modelos.DTOs;
 
 namespace Votacion.API.Controllers
 {
-    [Authorize]
+    
     [ApiController]
     [Route("api/[controller]")]
     public class VotosController : ControllerBase
@@ -30,12 +30,12 @@ namespace Votacion.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Votar([FromBody] VotoDTO dto)
         {
-            // 1️ Usuario desde el token
+            // 1️ Usuario desde el token (SIEMPRE así)
             var usuarioId = int.Parse(
                 User.FindFirst(ClaimTypes.NameIdentifier)!.Value
             );
 
-            // 2 Obtener candidato
+            // 2️ Buscar candidato
             var candidato = await _context.Candidatos
                 .Include(c => c.Eleccion)
                 .FirstOrDefaultAsync(c => c.CandidatoId == dto.CandidatoId);
@@ -43,7 +43,7 @@ namespace Votacion.API.Controllers
             if (candidato == null)
                 return BadRequest("Candidato no válido");
 
-            // 3️ Verificar si la elección está activa
+            // 3️ Verificar elección activa
             var ahora = DateTime.UtcNow;
             if (ahora < candidato.Eleccion.FechaInicio ||
                 ahora > candidato.Eleccion.FechaFin)
@@ -54,7 +54,7 @@ namespace Votacion.API.Controllers
             // 4️ Evitar doble voto
             var yaVoto = await _context.Votos.AnyAsync(v =>
                 v.EleccionId == candidato.EleccionId &&
-                v.HashVotante == usuarioId.ToString()
+                v.HashVotante == $"USR-{usuarioId}"
             );
 
             if (yaVoto)
@@ -66,7 +66,7 @@ namespace Votacion.API.Controllers
                 EleccionId = candidato.EleccionId,
                 CandidatoId = candidato.CandidatoId,
                 FechaRegistro = DateTime.UtcNow,
-                HashVotante = usuarioId.ToString()
+                HashVotante = $"USR-{usuarioId}"
             };
 
             _context.Votos.Add(voto);
@@ -74,5 +74,6 @@ namespace Votacion.API.Controllers
 
             return Ok("Voto registrado correctamente");
         }
+
     }
 }

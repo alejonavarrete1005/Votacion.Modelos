@@ -5,7 +5,7 @@ using Votacion.Modelos.DTOs;
 
 namespace Votacion.API.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    
     [ApiController]
     [Route("api/[controller]")]
     public class ResultadosController : ControllerBase
