@@ -24,29 +24,50 @@ namespace Votacion.API.Controllers
 
         // GET: api/Elecciones
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Eleccion>>> GetElecciones()
+        public async Task<ActionResult<IEnumerable<EleccionDTO>>> GetElecciones()
         {
-            return await _context.Elecciones
-                .Include(e => e.Candidatos)
+            var elecciones = await _context.Elecciones
+                .Select(e => new EleccionDTO
+                {
+                    EleccionId = e.EleccionId,
+                    Nombre = e.Nombre,
+                    Descripcion = e.Descripcion,
+                    Tipo = e.Tipo,
+                    FechaInicio = e.FechaInicio,
+                    FechaFin = e.FechaFin
+                })
                 .ToListAsync();
+
+            return Ok(elecciones);
         }
+
 
         // GET: api/Elecciones/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Eleccion>> GetEleccion(int id)
+        public async Task<ActionResult<EleccionDTO>> GetEleccion(int id)
         {
             var eleccion = await _context.Elecciones
-                .Include(e => e.Candidatos)
-                .FirstOrDefaultAsync(e => e.EleccionId == id);
+                .Where(e => e.EleccionId == id)
+                .Select(e => new EleccionDTO
+                {
+                    EleccionId = e.EleccionId,
+                    Nombre = e.Nombre,
+                    Descripcion = e.Descripcion,
+                    Tipo = e.Tipo,
+                    FechaInicio = e.FechaInicio,
+                    FechaFin = e.FechaFin
+                })
+                .FirstOrDefaultAsync();
 
             if (eleccion == null)
                 return NotFound();
 
-            return eleccion;
+            return Ok(eleccion);
         }
 
+
         // POST: api/Elecciones
-        
+
         [HttpPost]
         public async Task<ActionResult<Eleccion>> PostEleccion(EleccionDTO dto)
         {

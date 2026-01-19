@@ -7,6 +7,7 @@ namespace Votacion.Modelos.DTOs
 {
     public class EleccionDTO
     {
+        public int EleccionId { get; set; }   
         public string Nombre { get; set; }
         public string Descripcion { get; set; }
         public TipoEleccion Tipo { get; set; }

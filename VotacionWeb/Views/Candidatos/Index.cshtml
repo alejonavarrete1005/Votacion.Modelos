@@ -1,0 +1,34 @@
+﻿@model IEnumerable<Votacion.Modelos.DTOs.CandidatoDTO>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Candidatos</h1>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Propuesta</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Nombre</td>
+                <td>@item.Propuesta</td>
+                <td>
+                    <a asp-controller="Votos"
+                       asp-action="Votar"
+                       asp-route-candidatoId="@item.CandidatoId"
+                       class="btn btn-success btn-sm">
+                        Votar
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

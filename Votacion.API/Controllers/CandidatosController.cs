@@ -25,8 +25,15 @@ namespace Votacion.API.Controllers
         public async Task<IActionResult> GetCandidatos(int eleccionId)
         {
             var candidatos = await _context.Candidatos
-                .Include(c => c.Usuario)
+                .Include(c => c.Usuario) 
                 .Where(c => c.EleccionId == eleccionId)
+                .Select(c => new CandidatoDTO
+                {
+                    CandidatoId = c.CandidatoId,
+                    Nombre = c.Usuario.NombreCompleto,
+                    Propuesta = c.Propuesta,
+                    EleccionId = c.EleccionId
+                })
                 .ToListAsync();
 
             return Ok(candidatos);
@@ -35,6 +42,14 @@ namespace Votacion.API.Controllers
         [HttpPost]
         public async Task<IActionResult> PostCandidato(CandidatoCreateDTO dto)
         {
+            var usuario = await _context.Usuarios.FindAsync(dto.UsuarioId);
+            if (usuario == null)
+                return BadRequest("Usuario no válido");
+
+            var eleccion = await _context.Elecciones.FindAsync(dto.EleccionId);
+            if (eleccion == null)
+                return BadRequest("Elección no válida");
+
             var candidato = new Candidato
             {
                 UsuarioId = dto.UsuarioId,
@@ -45,8 +60,15 @@ namespace Votacion.API.Controllers
             _context.Candidatos.Add(candidato);
             await _context.SaveChangesAsync();
 
-            return Ok(candidato);
-        }
+            var result = new CandidatoDTO
+            {
+                CandidatoId = candidato.CandidatoId,
+                Nombre = usuario.NombreCompleto,
+                Propuesta = candidato.Propuesta,
+                EleccionId = candidato.EleccionId
+            };
 
+            return Ok(result);
+        }
     }
 }
