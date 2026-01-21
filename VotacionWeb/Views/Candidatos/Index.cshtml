@@ -2,37 +2,49 @@
 
 @{
     ViewData["Title"] = "Candidatos";
+    bool yaVoto = ViewBag.YaVoto != null && (bool)ViewBag.YaVoto;
 }
 
 <h1>Candidatos</h1>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Nombre</th>
-            <th>Propuesta</th>
-            <th>Acción</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+@if (yaVoto)
+{
+    <div class="alert alert-warning">
+        Ya has votado en esta elección. No puedes volver a votar.
+    </div>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
             <tr>
-                <td>@item.Nombre</td>
-                <td>@item.Propuesta</td>
-                <td>
-                    <form asp-controller="Votos"
-                          asp-action="Votar"
-                          method="post"
-                          style="display:inline;">
-                        <input type="hidden" name="candidatoId" value="@item.CandidatoId" />
-                        <button type="submit"
-                                class="btn btn-success btn-sm">
-                            Votar
-                        </button>
-                    </form>
-                </td>
+                <th>Nombre</th>
+                <th>Propuesta</th>
+                <th>Acción</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Nombre</td>
+                    <td>@item.Propuesta</td>
+                    <td>
+                        <form asp-controller="Votos"
+                              asp-action="Votar"
+                              method="post"
+                              style="display:inline;">
+                            <input type="hidden" name="candidatoId" value="@item.CandidatoId" />
+                            <input type="hidden" name="eleccionId" value="@ViewBag.EleccionId" />
+
+                            <button type="submit"
+                                    class="btn btn-success btn-sm">
+                                Votar
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
