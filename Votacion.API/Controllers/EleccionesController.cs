@@ -92,7 +92,7 @@ namespace Votacion.API.Controllers
 
 
         // PUT: api/Elecciones/5
-        
+
         [HttpPut("{id}")]
         public async Task<IActionResult> PutEleccion(int id, EleccionDTO dto)
         {
@@ -110,8 +110,9 @@ namespace Votacion.API.Controllers
             return NoContent();
         }
 
+
         // DELETE: api/Elecciones/5
-       
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEleccion(int id)
         {
