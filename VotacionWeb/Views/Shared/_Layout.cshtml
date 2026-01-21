@@ -41,6 +41,7 @@
                             </li>
                         }
                     </ul>
+
                     <ul class="navbar-nav">
                         @if (Context.Session.GetString("JWT") != null)
                         {
@@ -74,6 +75,24 @@
     </header>
 
     <div class="container">
+
+        <!-- MENSAJES GLOBALES -->
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                @TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
@@ -92,3 +111,4 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+

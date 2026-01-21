@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<Votacion.Modelos.DTOs.CandidatoDTO>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Candidatos";
 }
 
 <h1>Candidatos</h1>
@@ -11,7 +11,7 @@
         <tr>
             <th>Nombre</th>
             <th>Propuesta</th>
-            <th></th>
+            <th>Acción</th>
         </tr>
     </thead>
     <tbody>
@@ -21,12 +21,16 @@
                 <td>@item.Nombre</td>
                 <td>@item.Propuesta</td>
                 <td>
-                    <a asp-controller="Votos"
-                       asp-action="Votar"
-                       asp-route-candidatoId="@item.CandidatoId"
-                       class="btn btn-success btn-sm">
-                        Votar
-                    </a>
+                    <form asp-controller="Votos"
+                          asp-action="Votar"
+                          method="post"
+                          style="display:inline;">
+                        <input type="hidden" name="candidatoId" value="@item.CandidatoId" />
+                        <button type="submit"
+                                class="btn btn-success btn-sm">
+                            Votar
+                        </button>
+                    </form>
                 </td>
             </tr>
         }

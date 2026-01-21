@@ -30,25 +30,26 @@ namespace Votacion.API.Controllers
 
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] UsuarioRegisterDTO dto)
+        public async Task<IActionResult> Register(UsuarioRegisterDTO dto)
         {
             if (await _context.Usuarios.AnyAsync(u => u.Email == dto.Email))
-                return BadRequest("El correo ya existe");
+                return BadRequest("El correo ya está registrado");
 
             var usuario = new Usuario
             {
                 NombreCompleto = dto.NombreCompleto,
                 Email = dto.Email,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
-                Rol = RolUsuario.Votante,
-                Activo = true
+                Rol = dto.Rol
             };
+
+            usuario.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
             _context.Usuarios.Add(usuario);
             await _context.SaveChangesAsync();
 
-            return Ok(usuario);
+            return Ok("Usuario registrado correctamente");
         }
+
 
 
         [HttpPost("login")]

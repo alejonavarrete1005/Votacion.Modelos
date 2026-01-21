@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Text;
 using System.Text.Json;
+using Votacion.Modelos.DTOs;
 
 public class AuthController : Controller
 {
@@ -14,6 +15,12 @@ public class AuthController : Controller
     // GET: /Auth/Login
     [HttpGet]
     public IActionResult Login()
+    {
+        return View();
+    }
+   
+    [HttpGet]
+    public IActionResult Register()
     {
         return View();
     }
@@ -77,6 +84,27 @@ public class AuthController : Controller
 
         return RedirectToAction("Index", "Home");
     }
+
+    [HttpPost]
+    public async Task<IActionResult> Register(UsuarioRegisterDTO dto)
+    {
+        var client = _httpClientFactory.CreateClient("VotacionAPI");
+
+        var json = JsonSerializer.Serialize(dto);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var response = await client.PostAsync("api/Auth/register", content);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            ViewBag.Error = "No se pudo registrar el usuario";
+            return View(dto);
+        }
+
+        // Luego de registrar → ir al login
+        return RedirectToAction("Login");
+    }
+
 
     public IActionResult Logout()
     {

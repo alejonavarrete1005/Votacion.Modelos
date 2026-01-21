@@ -14,7 +14,7 @@ using Votacion.Modelos.DTOs;
 
 namespace Votacion.API.Controllers
 {
-    
+
     [ApiController]
     [Route("api/[controller]")]
     public class VotosController : ControllerBase
@@ -30,10 +30,18 @@ namespace Votacion.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Votar([FromBody] VotoDTO dto)
         {
+
             // 1️ Usuario desde el token (SIEMPRE así)
             var usuarioId = int.Parse(
-                User.FindFirst(ClaimTypes.NameIdentifier)!.Value
+            User.FindFirst(ClaimTypes.NameIdentifier)!.Value
             );
+
+            var usuarioExiste = await _context.Usuarios
+                .AnyAsync(u => u.UsuarioId == usuarioId);
+
+            if (!usuarioExiste)
+                return BadRequest("Usuario inválido");
+            
 
             // 2️ Buscar candidato
             var candidato = await _context.Candidatos
@@ -63,11 +71,12 @@ namespace Votacion.API.Controllers
             // 5️ Registrar voto
             var voto = new Voto
             {
+                UsuarioId = usuarioId, 
                 EleccionId = candidato.EleccionId,
                 CandidatoId = candidato.CandidatoId,
-                FechaRegistro = DateTime.UtcNow,
-                HashVotante = $"USR-{usuarioId}"
+                FechaRegistro = DateTime.UtcNow
             };
+
 
             _context.Votos.Add(voto);
             await _context.SaveChangesAsync();
