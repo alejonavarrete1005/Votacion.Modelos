@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Votacion.Modelos;
 using Votacion.Modelos.DTOs;
@@ -40,9 +42,14 @@ namespace Votacion.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> PostCandidato(CandidatoCreateDTO dto)
         {
-            var usuario = await _context.Usuarios.FindAsync(dto.UsuarioId);
+            var usuarioId = int.Parse(
+                User.FindFirst(ClaimTypes.NameIdentifier)!.Value
+            );
+
+            var usuario = await _context.Usuarios.FindAsync(usuarioId);
             if (usuario == null)
                 return BadRequest("Usuario no válido");
 
@@ -52,7 +59,7 @@ namespace Votacion.API.Controllers
 
             var candidato = new Candidato
             {
-                UsuarioId = dto.UsuarioId,
+                UsuarioId = usuarioId,     
                 EleccionId = dto.EleccionId,
                 Propuesta = dto.Propuesta
             };
@@ -60,15 +67,14 @@ namespace Votacion.API.Controllers
             _context.Candidatos.Add(candidato);
             await _context.SaveChangesAsync();
 
-            var result = new CandidatoDTO
+            return Ok(new CandidatoDTO
             {
                 CandidatoId = candidato.CandidatoId,
-                Nombre = usuario.NombreCompleto,
+                Nombre = usuario.NombreCompleto,   
                 Propuesta = candidato.Propuesta,
                 EleccionId = candidato.EleccionId
-            };
-
-            return Ok(result);
+            });
         }
+
     }
 }

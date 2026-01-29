@@ -2,34 +2,46 @@
 
 @{
     ViewData["Title"] = "Candidatos";
+
     bool yaVoto = ViewBag.YaVoto != null && (bool)ViewBag.YaVoto;
+    var rol = Context.Session.GetString("UsuarioRol"); // 1=Admin, 2=Votante, 3=Candidato
 }
 
 <h1>Candidatos</h1>
 
-@if (yaVoto)
+@if (rol == "1")
+{
+    <a asp-action="Create"
+       asp-route-eleccionId="@ViewBag.EleccionId"
+       class="btn btn-success mb-3">
+        Crear Candidato
+    </a>
+}
+
+@if (yaVoto && rol == "2")
 {
     <div class="alert alert-warning">
         Ya has votado en esta elección. No puedes volver a votar.
     </div>
 }
-else
-{
-    <table class="table table-striped">
-        <thead>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Propuesta</th>
+            <th>Acción</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
             <tr>
-                <th>Nombre</th>
-                <th>Propuesta</th>
-                <th>Acción</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>@item.Nombre</td>
-                    <td>@item.Propuesta</td>
-                    <td>
+                <td>@item.Nombre</td>
+                <td>@item.Propuesta</td>
+                <td>
+                    @if (rol == "2" && !yaVoto)
+                    {
                         <form asp-controller="Votos"
                               asp-action="Votar"
                               method="post"
@@ -42,9 +54,13 @@ else
                                 Votar
                             </button>
                         </form>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+                    }
+                    else
+                    {
+                        <span class="text-muted">—</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

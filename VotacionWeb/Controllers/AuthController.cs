@@ -82,7 +82,7 @@ public class AuthController : Controller
         HttpContext.Session.SetString("UsuarioRol",
             data.GetProperty("rol").GetInt32().ToString());
 
-        return RedirectToAction("Index", "Home");
+        return RedirectToAction("Index", "Elecciones");
     }
 
     [HttpPost]
